@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections.Generic;
@@ -55,8 +55,6 @@ namespace OpenSim.Grid.MessagingServer
 
         private UserDataBaseService m_userDataBaseService;
 
-        // private UUID m_lastCreatedUser = UUID.Random();
-
         protected static string m_consoleType = "local";
         protected static IConfigSource m_config = null;
         protected static string m_configFile = "MessagingServer_Config.xml";
@@ -68,6 +66,7 @@ namespace OpenSim.Grid.MessagingServer
             argvSource.AddSwitch("Startup", "xmlfile", "x");
 
             IConfig startupConfig = argvSource.Configs["Startup"];
+
             if (startupConfig != null)
             {
                 m_consoleType = startupConfig.GetString("console", "local");
@@ -78,7 +77,7 @@ namespace OpenSim.Grid.MessagingServer
 
             XmlConfigurator.Configure();
 
-            m_log.Info("[SERVER]: Launching MessagingServer...");
+            m_log.Info("[Server]: Launching MessagingServer...");
 
             OpenMessage_Main messageserver = new OpenMessage_Main();
 
@@ -100,6 +99,7 @@ namespace OpenSim.Grid.MessagingServer
                 m_console = new LocalConsole("Messaging");
                 break;
             }
+
             MainConsole.Instance = m_console;
         }
 
@@ -119,7 +119,7 @@ namespace OpenSim.Grid.MessagingServer
             {
                 if (m_httpServer == null)
                 {
-                    m_log.Info("[SERVER]: Starting HTTP process");
+                    m_log.Info("[Server]: Starting HTTP process");
                     m_httpServer = new BaseHttpServer(Cfg.HttpPort);
 
                     if (m_console is RemoteConsole)
@@ -144,25 +144,19 @@ namespace OpenSim.Grid.MessagingServer
 
                     m_httpServer.Start();
                 }
-                m_log.Info("[SERVER]: Userserver registration was successful");
+
+                m_log.Info("[Server]: Userserver registration was successful");
             }
             else
             {
-                m_log.Error("[STARTUP]: Unable to connect to User Server");
+                m_log.Error("[Startup]: Unable to connect to User Server");
             }
-
         }
 
         private void deregisterFromUserServer()
         {
             m_userServerModule.deregisterWithUserServer();
-//            if (m_httpServer != null)
-//            {
-                // try a completely fresh registration, with fresh handlers, too
-//                m_httpServer.Stop();
-//                m_httpServer = null;
-//            }
-            m_console.Output("[SERVER]: Deregistered from userserver.");
+            m_console.Output("[Server]: Deregistered from userserver.");
         }
 
         protected override void StartupSpecific()
@@ -172,9 +166,7 @@ namespace OpenSim.Grid.MessagingServer
             m_userDataBaseService = new UserDataBaseService();
             m_userDataBaseService.AddPlugin(Cfg.DatabaseProvider, Cfg.DatabaseConnect);
 
-            //Register the database access service so modules can fetch it
-           // RegisterInterface<UserDataBaseService>(m_userDataBaseService);
-
+            // Register the database access service so modules can fetch it
             m_userServerModule = new InterMessageUserServerModule(Cfg, this);
             m_userServerModule.Initialise();
 
@@ -190,7 +182,7 @@ namespace OpenSim.Grid.MessagingServer
             msgsvc.PostInitialise();
             m_regionModule.PostInitialise();
 
-            m_log.Info("[SERVER]: Messageserver 0.5 - Startup complete");
+            m_log.Info("[Server]: Messageserver 0.5 - Startup complete");
 
             base.StartupSpecific();
 
@@ -205,37 +197,13 @@ namespace OpenSim.Grid.MessagingServer
 
         public void do_create(string what)
         {
-            //switch (what)
-            //{
-            //    case "user":
-            //        try
-            //        {
-            //            //userID =
-            //                //m_userManager.AddUserProfile(tempfirstname, templastname, tempMD5Passwd, regX, regY);
-            //        } catch (Exception ex)
-            //        {
-            //            m_console.Error("[SERVER]: Error creating user: {0}", ex.ToString());
-            //        }
-
-            //        try
-            //        {
-            //            //RestObjectPoster.BeginPostObject<Guid>(m_userManager._config.InventoryUrl + "CreateInventory/",
-            //                                                   //userID.Guid);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            m_console.Error("[SERVER]: Error creating inventory for user: {0}", ex.ToString());
-            //        }
-            //        // m_lastCreatedUser = userID;
-            //        break;
-            //}
+           
         }
 
         private void HandleClearCache(string module, string[] cmd)
         {
             int entries = m_regionModule.ClearRegionCache();
-            m_console.Output("Region cache cleared! Cleared " +
-                    entries.ToString() + " entries");
+            m_console.Output("Region cache cleared! Cleared " + entries.ToString() + " entries");
         }
 
         private void HandleRegister(string module, string[] cmd)
@@ -250,6 +218,7 @@ namespace OpenSim.Grid.MessagingServer
         }
 
         #region IUGAIMCore
+
         protected Dictionary<Type, object> m_moduleInterfaces = new Dictionary<Type, object>();
 
         /// <summary>
@@ -275,6 +244,7 @@ namespace OpenSim.Grid.MessagingServer
                 iface = (T)m_moduleInterfaces[typeof(T)];
                 return true;
             }
+
             iface = default(T);
             return false;
         }
@@ -288,6 +258,7 @@ namespace OpenSim.Grid.MessagingServer
         {
             return m_httpServer;
         }
+
         #endregion
     }
 }

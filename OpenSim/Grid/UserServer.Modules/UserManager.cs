@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections;
@@ -129,8 +129,7 @@ namespace OpenSim.Grid.UserServer.Modules
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns>Success "OK" else error</returns>
-        public string RestDeleteUserSessionMethod(string request, string path, string param,
-                                                  OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public string RestDeleteUserSessionMethod(string request, string path, string param, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             // TODO! Important!
 
@@ -141,6 +140,7 @@ namespace OpenSim.Grid.UserServer.Modules
         {
             XmlRpcResponse response = new XmlRpcResponse();
             Hashtable responseData = new Hashtable();
+            
             // Query Result Information
             responseData["queryid"] = queryID.ToString();
             responseData["avcount"] = returnUsers.Count.ToString();
@@ -151,6 +151,7 @@ namespace OpenSim.Grid.UserServer.Modules
                 responseData["firstname" + i] = returnUsers[i].firstName;
                 responseData["lastname" + i] = returnUsers[i].lastName;
             }
+
             response.Value = responseData;
 
             return response;
@@ -171,9 +172,11 @@ namespace OpenSim.Grid.UserServer.Modules
             responseData["lastname"] = profile.SurName;
             responseData["email"] = profile.Email;
             responseData["uuid"] = profile.ID.ToString();
+            
             // Server Information
             responseData["server_inventory"] = profile.UserInventoryURI;
             responseData["server_asset"] = profile.UserAssetURI;
+            
             // Profile Information
             responseData["profile_about"] = profile.AboutText;
             responseData["profile_firstlife_about"] = profile.FirstLifeAboutText;
@@ -183,6 +186,7 @@ namespace OpenSim.Grid.UserServer.Modules
             responseData["profile_image"] = profile.Image.ToString();
             responseData["profile_created"] = profile.Created.ToString();
             responseData["profile_lastlogin"] = profile.LastLogin.ToString();
+            
             // Home region information
             responseData["home_coordinates_x"] = profile.HomeLocation.X.ToString();
             responseData["home_coordinates_y"] = profile.HomeLocation.Y.ToString();
@@ -213,26 +217,32 @@ namespace OpenSim.Grid.UserServer.Modules
         /// <param name="remoteClient"></param>
         /// <returns></returns>
         public XmlRpcResponse XmlRPCAuthenticateUserMethodPassword(XmlRpcRequest request, IPEndPoint remoteClient)
-        {
-//            m_log.DebugFormat("[USER MANAGER]: Received authenticated user by password request from {0}", remoteClient);
-            
+        {            
             Hashtable requestData = (Hashtable)request.Params[0];
             string userUuidRaw = (string)requestData["user_uuid"];
             string password = (string)requestData["password"];
 
             if (null == userUuidRaw)
+            {
                 return Util.CreateUnknownUserErrorResponse();
+            }
 
             UUID userUuid;
+
             if (!UUID.TryParse(userUuidRaw, out userUuid))
+            {
                 return Util.CreateUnknownUserErrorResponse();
+            }
 
             UserProfileData userProfile = m_userDataBaseService.GetUserProfile(userUuid);
+
             if (null == userProfile)
+            {
                 return Util.CreateUnknownUserErrorResponse();
+            }
 
             string authed;
-            
+
             if (null == password)
             {
                 authed = "FALSE";
@@ -240,14 +250,14 @@ namespace OpenSim.Grid.UserServer.Modules
             else
             {
                 if (m_userDataBaseService.AuthenticateUserByPassword(userUuid, password))
+                {
                     authed = "TRUE";
+                }
                 else
+                {
                     authed = "FALSE";
+                }
             }
-
-//            m_log.DebugFormat(
-//                "[USER MANAGER]: Authentication by password result from {0} for {1} is {2}",
-//                remoteClient, userUuid, authed);
 
             XmlRpcResponse response = new XmlRpcResponse();
             Hashtable responseData = new Hashtable();
@@ -259,7 +269,6 @@ namespace OpenSim.Grid.UserServer.Modules
 
         public XmlRpcResponse XmlRPCGetAvatarPickerAvatar(XmlRpcRequest request, IPEndPoint remoteClient)
         {
-            // XmlRpcResponse response = new XmlRpcResponse();
             Hashtable requestData = (Hashtable)request.Params[0];
             List<AvatarPickerAvatar> returnAvatar = new List<AvatarPickerAvatar>();
             UUID queryID = new UUID(UUID.Zero.ToString());
@@ -270,7 +279,7 @@ namespace OpenSim.Grid.UserServer.Modules
                 returnAvatar = m_userDataBaseService.GenerateAgentPickerRequestResponse(queryID, (string)requestData["avquery"]);
             }
 
-            m_log.InfoFormat("[AVATARINFO]: Servicing Avatar Query: " + (string)requestData["avquery"]);
+            m_log.InfoFormat("[Avatar Info]: Servicing Avatar Query: " + (string)requestData["avquery"]);
             return AvatarPickerListtoXmlRPCResponse(queryID, returnAvatar);
         }
 
@@ -281,10 +290,8 @@ namespace OpenSim.Grid.UserServer.Modules
             Hashtable responseData = new Hashtable();
             string returnstring = "FALSE";
 
-            if (requestData.Contains("avatar_id") && requestData.Contains("region_handle") &&
-                requestData.Contains("region_uuid"))
+            if (requestData.Contains("avatar_id") && requestData.Contains("region_handle") && requestData.Contains("region_uuid"))
             {
-                // ulong cregionhandle = 0;
                 UUID regionUUID;
                 UUID avatarUUID;
 
@@ -296,10 +303,7 @@ namespace OpenSim.Grid.UserServer.Modules
                     UserProfileData userProfile = m_userDataBaseService.GetUserProfile(avatarUUID);
                     userProfile.CurrentAgent.Region = regionUUID;
                     userProfile.CurrentAgent.Handle = (ulong)Convert.ToInt64((string)requestData["region_handle"]);
-                    //userProfile.CurrentAgent.
                     m_userDataBaseService.CommitAgent(ref userProfile);
-                    //setUserProfile(userProfile);
-
                     returnstring = "TRUE";
                 }
             }
@@ -311,23 +315,24 @@ namespace OpenSim.Grid.UserServer.Modules
 
         public XmlRpcResponse XmlRPCGetUserMethodName(XmlRpcRequest request, IPEndPoint remoteClient)
         {
-            // XmlRpcResponse response = new XmlRpcResponse();
             Hashtable requestData = (Hashtable)request.Params[0];
             UserProfileData userProfile;
+
             if (requestData.Contains("avatar_name"))
             {
                 string query = (string)requestData["avatar_name"];
 
                 if (null == query)
+                {
                     return Util.CreateUnknownUserErrorResponse();
-
-                // Regex objAlphaNumericPattern = new Regex("[^a-zA-Z0-9]");
+                }
 
                 string[] querysplit = query.Split(' ');
 
                 if (querysplit.Length == 2)
                 {
                     userProfile = m_userDataBaseService.GetUserProfile(querysplit[0], querysplit[1]);
+
                     if (userProfile == null)
                     {
                         return Util.CreateUnknownUserErrorResponse();
@@ -348,11 +353,9 @@ namespace OpenSim.Grid.UserServer.Modules
 
         public XmlRpcResponse XmlRPCGetUserMethodUUID(XmlRpcRequest request, IPEndPoint remoteClient)
         {
-            // XmlRpcResponse response = new XmlRpcResponse();
             Hashtable requestData = (Hashtable)request.Params[0];
             UserProfileData userProfile;
-            //CFK: this clogs the UserServer log and is not necessary at this time.
-            //CFK: m_log.Debug("METHOD BY UUID CALLED");
+
             if (requestData.Contains("avatar_uuid"))
             {
                 try
@@ -384,8 +387,7 @@ namespace OpenSim.Grid.UserServer.Modules
             XmlRpcResponse response = new XmlRpcResponse();
             Hashtable requestData = (Hashtable)request.Params[0];
             UserProfileData userProfile;
-            //CFK: this clogs the UserServer log and is not necessary at this time.
-            //CFK: m_log.Debug("METHOD BY UUID CALLED");
+
             if (requestData.Contains("avatar_uuid"))
             {
                 UUID guess;
@@ -409,14 +411,20 @@ namespace OpenSim.Grid.UserServer.Modules
                 {
                     return Util.CreateUnknownUserErrorResponse();
                 }
+
                 Hashtable responseData = new Hashtable();
 
                 responseData["handle"] = userProfile.CurrentAgent.Handle.ToString();
                 responseData["session"] = userProfile.CurrentAgent.SessionID.ToString();
+
                 if (userProfile.CurrentAgent.AgentOnline)
+                {
                     responseData["agent_online"] = "TRUE";
+                }
                 else
+                {
                     responseData["agent_online"] = "FALSE";
+                }
 
                 response.Value = responseData;
             }
@@ -430,7 +438,7 @@ namespace OpenSim.Grid.UserServer.Modules
 
         public XmlRpcResponse XmlRpcResponseXmlRPCUpdateUserProfile(XmlRpcRequest request, IPEndPoint remoteClient)
         {
-            m_log.Debug("[UserManager]: Got request to update user profile");
+            m_log.Debug("[User Manager]: Got request to update user profile");
             XmlRpcResponse response = new XmlRpcResponse();
             Hashtable requestData = (Hashtable)request.Params[0];
             Hashtable responseData = new Hashtable();
@@ -442,38 +450,47 @@ namespace OpenSim.Grid.UserServer.Modules
 
             UUID UserUUID = new UUID((string)requestData["avatar_uuid"]);
             UserProfileData userProfile = m_userDataBaseService.GetUserProfile(UserUUID);
+
             if (null == userProfile)
             {
                 return Util.CreateUnknownUserErrorResponse();
             }
+            
             // don't know how yet.
             if (requestData.Contains("AllowPublish"))
             {
             }
+
             if (requestData.Contains("FLImageID"))
             {
                 userProfile.FirstLifeImage = new UUID((string)requestData["FLImageID"]);
             }
+
             if (requestData.Contains("ImageID"))
             {
                 userProfile.Image = new UUID((string)requestData["ImageID"]);
             }
+            
             // dont' know how yet
             if (requestData.Contains("MaturePublish"))
             {
             }
+
             if (requestData.Contains("AboutText"))
             {
                 userProfile.AboutText = (string)requestData["AboutText"];
             }
+
             if (requestData.Contains("FLAboutText"))
             {
                 userProfile.FirstLifeAboutText = (string)requestData["FLAboutText"];
             }
+            
             // not in DB yet.
             if (requestData.Contains("ProfileURL"))
             {
             }
+
             if (requestData.Contains("home_region"))
             {
                 try
@@ -482,23 +499,25 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (ArgumentException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home region, Invalid Argument");
+                    m_log.Error("[Profile]: Failed to set home region, Invalid Argument");
                 }
                 catch (FormatException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home region, Invalid Format");
+                    m_log.Error("[Profile]: Failed to set home region, Invalid Format");
                 }
                 catch (OverflowException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home region, Value was too large");
+                    m_log.Error("[Profile]: Failed to set home region, Value was too large");
                 }
             }
+
             if (requestData.Contains("home_region_id"))
             {
                 UUID regionID;
                 UUID.TryParse((string)requestData["home_region_id"], out regionID);
                 userProfile.HomeRegionID = regionID;
             }
+
             if (requestData.Contains("home_pos_x"))
             {
                 try
@@ -507,9 +526,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home postion x");
+                    m_log.Error("[Profile]: Failed to set home postion x");
                 }
             }
+
             if (requestData.Contains("home_pos_y"))
             {
                 try
@@ -518,9 +538,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home postion y");
+                    m_log.Error("[Profile]: Failed to set home postion y");
                 }
             }
+
             if (requestData.Contains("home_pos_z"))
             {
                 try
@@ -529,9 +550,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home postion z");
+                    m_log.Error("[Profile]: Failed to set home postion z");
                 }
             }
+
             if (requestData.Contains("home_look_x"))
             {
                 try
@@ -540,9 +562,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home lookat x");
+                    m_log.Error("[Profile]: Failed to set home lookat x");
                 }
             }
+
             if (requestData.Contains("home_look_y"))
             {
                 try
@@ -551,9 +574,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home lookat y");
+                    m_log.Error("[Profile]: Failed to set home lookat y");
                 }
             }
+
             if (requestData.Contains("home_look_z"))
             {
                 try
@@ -562,9 +586,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set home lookat z");
+                    m_log.Error("[Profile]: Failed to set home lookat z");
                 }
             }
+
             if (requestData.Contains("user_flags"))
             {
                 try
@@ -573,9 +598,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set user flags");
+                    m_log.Error("[Profile]: Failed to set user flags");
                 }
             }
+
             if (requestData.Contains("god_level"))
             {
                 try
@@ -584,9 +610,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set god level");
+                    m_log.Error("[Profile]: Failed to set god level");
                 }
             }
+
             if (requestData.Contains("custom_type"))
             {
                 try
@@ -595,9 +622,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set custom type");
+                    m_log.Error("[Profile]: Failed to set custom type");
                 }
             }
+
             if (requestData.Contains("partner"))
             {
                 try
@@ -606,7 +634,7 @@ namespace OpenSim.Grid.UserServer.Modules
                 }
                 catch (InvalidCastException)
                 {
-                    m_log.Error("[PROFILE]:Failed to set partner");
+                    m_log.Error("[Profile]: Failed to set partner");
                 }
             }
             else
@@ -643,14 +671,17 @@ namespace OpenSim.Grid.UserServer.Modules
                         (float)Convert.ToDecimal((string)requestData["lookat_z"], Culture.NumberFormatInfo));
 
                     handlerLogOffUser = OnLogOffUser;
+
                     if (handlerLogOffUser != null)
+                    {
                         handlerLogOffUser(userUUID);
+                    }
 
                     m_userDataBaseService.LogOffUser(userUUID, RegionID, regionhandle, position, lookat);
                 }
                 catch (FormatException)
                 {
-                    m_log.Warn("[LOGOUT]: Error in Logout XMLRPC Params");
+                    m_log.Warn("[Log Out]: Error in Logout XMLRPC Params");
                     return response;
                 }
             }
@@ -664,10 +695,10 @@ namespace OpenSim.Grid.UserServer.Modules
 
         #endregion
 
-
         public void HandleAgentLocation(UUID agentID, UUID regionID, ulong regionHandle)
         {
             UserProfileData userProfile = m_userDataBaseService.GetUserProfile(agentID);
+
             if (userProfile != null)
             {
                 userProfile.CurrentAgent.Region = regionID;
@@ -679,27 +710,34 @@ namespace OpenSim.Grid.UserServer.Modules
         public void HandleAgentLeaving(UUID agentID, UUID regionID, ulong regionHandle)
         {
             UserProfileData userProfile = m_userDataBaseService.GetUserProfile(agentID);
+
             if (userProfile != null)
             {
                 if (userProfile.CurrentAgent.Region == regionID)
                 {
                     UserAgentData userAgent = userProfile.CurrentAgent;
+
                     if (userAgent != null && userAgent.AgentOnline)
                     {
                         userAgent.AgentOnline = false;
                         userAgent.LogoutTime = Util.UnixTimeSinceEpoch();
+
                         if (regionID != UUID.Zero)
                         {
                             userAgent.Region = regionID;
                         }
+
                         userAgent.Handle = regionHandle;
                         userProfile.LastLogin = userAgent.LogoutTime;
 
                         m_userDataBaseService.CommitAgent(ref userProfile);
 
                         handlerLogOffUser = OnLogOffUser;
+
                         if (handlerLogOffUser != null)
+                        {
                             handlerLogOffUser(agentID);
+                        }
                     }
                 }
             }

@@ -1,29 +1,29 @@
-﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+﻿/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections;
@@ -38,7 +38,6 @@ using OpenSim.Data;
 using OpenSim.Framework;
 using OpenSim.Framework.Communications;
 using OpenSim.Framework.Servers;
-
 
 namespace OpenSim.Grid.GridServer.Modules
 {
@@ -89,7 +88,7 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch (Exception)
                 {
-                    m_log.Warn("[storage]: Unable to write log via " + plugin.Name);
+                    m_log.Warn("[Storage]: Unable to write log via " + plugin.Name);
                 }
             }
         }
@@ -109,9 +108,10 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch (Exception e)
                 {
-                    m_log.Warn("[storage]: GetRegion - " + e.Message);
+                    m_log.Warn("[Storage]: GetRegion - " + e.Message);
                 }
             }
+
             return null;
         }
 
@@ -130,10 +130,11 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch (Exception ex)
                 {
-                    m_log.Debug("[storage]: " + ex.Message);
-                    m_log.Warn("[storage]: Unable to find region " + handle.ToString() + " via " + plugin.Name);
+                    m_log.Debug("[Storage]: " + ex.Message);
+                    m_log.Warn("[Storage]: Unable to find region " + handle.ToString() + " via " + plugin.Name);
                 }
             }
+
             return null;
         }
 
@@ -152,9 +153,10 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch
                 {
-                    m_log.Warn("[storage]: Unable to find region " + regionName + " via " + plugin.Name);
+                    m_log.Warn("[Storage]: Unable to find region " + regionName + " via " + plugin.Name);
                 }
             }
+
             return null;
         }
 
@@ -170,7 +172,7 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch
                 {
-                    m_log.Warn("[storage]: Unable to query regionblock via " + plugin.Name);
+                    m_log.Warn("[Storage]: Unable to query regionblock via " + plugin.Name);
                 }
             }
 
@@ -180,17 +182,22 @@ namespace OpenSim.Grid.GridServer.Modules
         public List<RegionProfileData> GetRegions(string name, int maxNum)
         {
             List<RegionProfileData> regions = new List<RegionProfileData>();
+
             foreach (IGridDataPlugin plugin in _plugins)
             {
                 try
                 {
                     int num = maxNum - regions.Count;
                     List<RegionProfileData> profiles = plugin.GetRegionsByName(name, (uint)num);
-                    if (profiles != null) regions.AddRange(profiles);
+
+                    if (profiles != null)
+                    {
+                        regions.AddRange(profiles);
+                    }
                 }
                 catch
                 {
-                    m_log.Warn("[storage]: Unable to query regionblock via " + plugin.Name);
+                    m_log.Warn("[Storage]: Unable to query regionblock via " + plugin.Name);
                 }
             }
 
@@ -200,6 +207,7 @@ namespace OpenSim.Grid.GridServer.Modules
         public DataResponse AddUpdateRegion(RegionProfileData sim, RegionProfileData existingSim)
         {
             DataResponse insertResponse = DataResponse.RESPONSE_ERROR;
+
             foreach (IGridDataPlugin plugin in _plugins)
             {
                 try
@@ -215,35 +223,31 @@ namespace OpenSim.Grid.GridServer.Modules
                 }
                 catch (Exception e)
                 {
-                    m_log.Warn("[LOGIN END]: " +
-                                          "Unable to login region " + sim.ToString() + " via " + plugin.Name);
-                    m_log.Warn("[LOGIN END]: " + e.ToString());
+                    m_log.Warn("[End Login]: " + "Unable to login region " + sim.ToString() + " via " + plugin.Name);
+                    m_log.Warn("[End Login]: " + e.ToString());
                 }
             }
+
             return insertResponse;
         }
 
         public DataResponse DeleteRegion(string uuid)
         {
             DataResponse insertResponse = DataResponse.RESPONSE_ERROR;
+
             foreach (IGridDataPlugin plugin in _plugins)
             {
-                //OpenSim.Data.MySQL.MySQLGridData dbengine = new OpenSim.Data.MySQL.MySQLGridData();
                 try
                 {
-                    //Nice are we not using multiple databases?
-                    //MySQLGridData mysqldata = (MySQLGridData)(plugin);
-
-                    //DataResponse insertResponse = mysqldata.DeleteProfile(TheSim);
                     insertResponse = plugin.DeleteProfile(uuid);
                 }
                 catch (Exception)
                 {
-                    m_log.Error("storage Unable to delete region " + uuid + " via " + plugin.Name);
-                    //MainLog.Instance.Warn("storage", e.ToString());
+                    m_log.Error("[Storage]: Unable to delete region " + uuid + " via " + plugin.Name);
                     insertResponse = DataResponse.RESPONSE_ERROR;
                 }
             }
+
             return insertResponse;
         }
 
@@ -253,31 +257,28 @@ namespace OpenSim.Grid.GridServer.Modules
             {
                 try
                 {
-                    //Check reservations
-                    ReservationData reserveData =
-                        plugin.GetReservationAtPoint(theSim.regionLocX, theSim.regionLocY);
+                    // Check reservations
+                    ReservationData reserveData = plugin.GetReservationAtPoint(theSim.regionLocX, theSim.regionLocY);
+
                     if ((reserveData != null && reserveData.gridRecvKey == theSim.regionRecvKey) ||
                         (reserveData == null && authkeynode.InnerText != theSim.regionRecvKey))
                     {
                         plugin.StoreProfile(theSim);
-                        m_log.Info("[grid]: New sim added to grid (" + theSim.regionName + ")");
-                        logToDB(theSim.ToString(), "RestSetSimMethod", String.Empty, 5,
-                                "Region successfully updated and connected to grid.");
+                        m_log.Info("[Grid]: New sim added to grid (" + theSim.regionName + ")");
+                        logToDB(theSim.ToString(), "RestSetSimMethod", String.Empty, 5, "Region successfully updated and connected to grid.");
                     }
                     else
                     {
-                        m_log.Warn("[grid]: " +
-                                   "Unable to update region (RestSetSimMethod): Incorrect reservation auth key.");
-                        // Wanted: " + reserveData.gridRecvKey + ", Got: " + theSim.regionRecvKey + ".");
+                        m_log.Warn("[Grid]: " + "Unable to update region (RestSetSimMethod): Incorrect reservation auth key.");
                         return "Unable to update region (RestSetSimMethod): Incorrect auth key.";
                     }
                 }
                 catch (Exception e)
                 {
-                    m_log.Warn("[GRID]: GetRegionPlugin Handle " + plugin.Name + " unable to add new sim: " +
-                                                  e.ToString());
+                    m_log.Warn("[Grid]: GetRegionPlugin Handle " + plugin.Name + " unable to add new sim: " + e.ToString());
                 }
             }
+
             return "OK";
         }
     }

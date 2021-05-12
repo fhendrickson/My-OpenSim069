@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System.Collections;
 using System.Collections.Generic;
@@ -65,7 +65,6 @@ namespace OpenSim.Grid.UserServer.Modules
     public delegate void AgentLeavingDelegate(UUID agentID, UUID regionID, ulong regionHandle);
     public delegate void RegionStartupDelegate(UUID regionID);
     public delegate void RegionShutdownDelegate(UUID regionID);
-
 
     public class MessageServersConnector
     {
@@ -110,6 +109,7 @@ namespace OpenSim.Grid.UserServer.Modules
             m_httpServer.AddXmlRPCHandler("region_shutdown", RegionShutdown);
             m_httpServer.AddXmlRPCHandler("agent_location", AgentLocation);
             m_httpServer.AddXmlRPCHandler("agent_leaving", AgentLeaving);
+
             // Message Server ---> User Server
             m_httpServer.AddXmlRPCHandler("register_messageserver", XmlRPCRegisterMessageServer);
             m_httpServer.AddXmlRPCHandler("agent_change_region", XmlRPCUserMovedtoRegion);
@@ -121,7 +121,9 @@ namespace OpenSim.Grid.UserServer.Modules
             lock (MessageServers)
             {
                 if (!MessageServers.ContainsKey(URI))
+                {
                     MessageServers.Add(URI, serverData);
+                }
             }
         }
 
@@ -130,7 +132,9 @@ namespace OpenSim.Grid.UserServer.Modules
             lock (MessageServers)
             {
                 if (MessageServers.ContainsKey(URI))
+                {
                     MessageServers.Remove(URI);
+                }
             }
         }
 
@@ -138,7 +142,7 @@ namespace OpenSim.Grid.UserServer.Modules
         {
             if (!MessageServers.ContainsKey(URI))
             {
-                m_log.Warn("[MSGSERVER]: Got addResponsibleRegion Request for a MessageServer that isn't registered");
+                m_log.Warn("[Message Server]: Got addResponsibleRegion Request for a MessageServer that isn't registered");
             }
             else
             {
@@ -147,23 +151,25 @@ namespace OpenSim.Grid.UserServer.Modules
                 MessageServers["URI"] = msginfo;
             }
         }
+
         public void RemoveResponsibleRegion(string URI, ulong regionhandle)
         {
             if (!MessageServers.ContainsKey(URI))
             {
-                m_log.Warn("[MSGSERVER]: Got RemoveResponsibleRegion Request for a MessageServer that isn't registered");
+                m_log.Warn("[Message Server]: Got RemoveResponsibleRegion Request for a MessageServer that isn't registered");
             }
             else
             {
                 MessageServerInfo msginfo = MessageServers["URI"];
+
                 if (msginfo.responsibleForRegions.Contains(regionhandle))
                 {
                     msginfo.responsibleForRegions.Remove(regionhandle);
                     MessageServers["URI"] = msginfo;
                 }
             }
-
         }
+
         public XmlRpcResponse XmlRPCRegisterMessageServer(XmlRpcRequest request, IPEndPoint remoteClient)
         {
             XmlRpcResponse response = new XmlRpcResponse();
@@ -183,8 +189,10 @@ namespace OpenSim.Grid.UserServer.Modules
                 responseData["responsestring"] = "TRUE";
                 response.Value = responseData;
             }
+
             return response;
         }
+
         public XmlRpcResponse XmlRPCDeRegisterMessageServer(XmlRpcRequest request, IPEndPoint remoteClient)
         {
             XmlRpcResponse response = new XmlRpcResponse();
@@ -199,6 +207,7 @@ namespace OpenSim.Grid.UserServer.Modules
                 responseData["responsestring"] = "TRUE";
                 response.Value = responseData;
             }
+
             return response;
         }
         
@@ -210,24 +219,15 @@ namespace OpenSim.Grid.UserServer.Modules
 
             if (requestData.Contains("fromuri"))
             {
-                // string sURI = (string)requestData["fromuri"];
-                // string sagentID = (string)requestData["agentid"];
-                // string ssessionID = (string)requestData["sessionid"];
-                // string scurrentRegionID = (string)requestData["regionid"];
-                // string sregionhandle = (string)requestData["regionhandle"];
-                // string scurrentpos = (string)requestData["currentpos"];
-                //Vector3.TryParse((string)reader["currentPos"], out retval.currentPos);
-                // TODO: Okay now raise event so the user server can pass this data to the Usermanager
-
                 responseData["responsestring"] = "TRUE";
                 response.Value = responseData;
             }
+
             return response;
         }
 
         public void TellMessageServersAboutUser(UUID agentID, UUID sessionID, UUID RegionID,
-                                                ulong regionhandle, float positionX, float positionY,
-                                                float positionZ, string firstname, string lastname)
+            ulong regionhandle, float positionX, float positionY, float positionZ, string firstname, string lastname)
         {
             PresenceNotification notification = new PresenceNotification();
 
@@ -246,25 +246,19 @@ namespace OpenSim.Grid.UserServer.Modules
         }
 
         private void TellMessageServersAboutUserInternal(UUID agentID, UUID sessionID, UUID RegionID,
-                                                ulong regionhandle, float positionX, float positionY,
-                                                float positionZ, string firstname, string lastname)
+            ulong regionhandle, float positionX, float positionY, float positionZ, string firstname, string lastname)
         {
             // Loop over registered Message Servers (AND THERE WILL BE MORE THEN ONE :D)
             lock (MessageServers)
             {
                 if (MessageServers.Count > 0)
                 {
-                    m_log.Info("[MSGCONNECTOR]: Sending login notice to registered message servers");
+                    m_log.Info("[Message Connector]: Sending login notice to registered message servers");
                 }
-//                else
-//                {
-//                    m_log.Debug("[MSGCONNECTOR]: No Message Servers registered, ignoring");
-//                }
+
                 foreach (MessageServerInfo serv in MessageServers.Values)
                 {
-                    NotifyMessageServerAboutUser(serv, agentID, sessionID, RegionID,
-                                                regionhandle, positionX, positionY, positionZ,
-                                                firstname, lastname);
+                    NotifyMessageServerAboutUser(serv, agentID, sessionID, RegionID, regionhandle, positionX, positionY, positionZ, firstname, lastname);
                 }
             }
         }
@@ -275,12 +269,9 @@ namespace OpenSim.Grid.UserServer.Modules
             {
                 if (MessageServers.Count > 0)
                 {
-                    m_log.Info("[MSGCONNECTOR]: Sending logoff notice to registered message servers");
+                    m_log.Info("[Message Connector]: Sending logoff notice to registered message servers");
                 }
-                else
-                {
-//                    m_log.Debug("[MSGCONNECTOR]: No Message Servers registered, ignoring");
-                }
+
                 foreach (MessageServerInfo serv in MessageServers.Values)
                 {
                     NotifyMessageServerAboutUserLogoff(serv,agentID);
@@ -294,12 +285,9 @@ namespace OpenSim.Grid.UserServer.Modules
             {
                 if (MessageServers.Count > 0)
                 {
-                    m_log.Info("[MSGCONNECTOR]: Sending region down notice to registered message servers");
+                    m_log.Info("[Message Connector]: Sending region down notice to registered message servers");
                 }
-                else
-                {
-//                    m_log.Debug("[MSGCONNECTOR]: No Message Servers registered, ignoring");
-                }
+
                 foreach (MessageServerInfo serv in MessageServers.Values)
                 {
                     NotifyMessageServerAboutRegionShutdown(serv,regionID);
@@ -336,15 +324,17 @@ namespace OpenSim.Grid.UserServer.Modules
             SendParams.Add(reqparams);
 
             XmlRpcRequest GridReq = new XmlRpcRequest("logout_of_simulator", SendParams);
+
             try
             {
                 GridReq.Send(serv.URI, 6000);
             }
             catch (WebException)
             {
-                m_log.Warn("[MSGCONNECTOR]: Unable to notify Message Server about log out.  Other users might still think this user is online");
+                m_log.Warn("[Message Connector]: Unable to notify Message Server about log out.  Other users might still think this user is online");
             }
-            m_log.Info("[LOGOUT]: Notified : " + serv.URI + " about user logout");
+
+            m_log.Info("[Log Out]: Notified : " + serv.URI + " about user logout");
         }
 
         private void NotifyMessageServerAboutRegionShutdown(MessageServerInfo serv, UUID regionID)
@@ -356,21 +346,21 @@ namespace OpenSim.Grid.UserServer.Modules
             SendParams.Add(reqparams);
 
             XmlRpcRequest GridReq = new XmlRpcRequest("process_region_shutdown", SendParams);
+
             try
             {
                 GridReq.Send(serv.URI, 6000);
             }
             catch (WebException)
             {
-                m_log.Warn("[MSGCONNECTOR]: Unable to notify Message Server about region shutdown.");
+                m_log.Warn("[Message Connector]: Unable to notify Message Server about region shutdown.");
             }
-            m_log.Info("[REGION UPDOWN]: Notified : " + serv.URI + " about region state change");
+
+            m_log.Info("[Region Up/Down]: Notified : " + serv.URI + " about region state change");
         }
 
-        private void NotifyMessageServerAboutUser(MessageServerInfo serv,
-                                                    UUID agentID, UUID sessionID, UUID RegionID,
-                                                    ulong regionhandle, float positionX, float positionY, float positionZ,
-                                                    string firstname, string lastname)
+        private void NotifyMessageServerAboutUser(MessageServerInfo serv, UUID agentID, UUID sessionID, UUID RegionID,
+            ulong regionhandle, float positionX, float positionY, float positionZ, string firstname, string lastname)
         {
             Hashtable reqparams = new Hashtable();
             reqparams["sendkey"] = serv.sendkey;
@@ -384,22 +374,20 @@ namespace OpenSim.Grid.UserServer.Modules
             reqparams["firstname"] = firstname;
             reqparams["lastname"] = lastname;
 
-            //reqparams["position"] = Position.ToString();
-
             ArrayList SendParams = new ArrayList();
             SendParams.Add(reqparams);
 
             XmlRpcRequest GridReq = new XmlRpcRequest("login_to_simulator", SendParams);
+
             try
             {
                 GridReq.Send(serv.URI, 6000);
-                m_log.Info("[LOGIN]: Notified : " + serv.URI + " about user login");
+                m_log.Info("[Login]: Notified : " + serv.URI + " about user login");
             }
             catch (WebException)
             {
-                m_log.Warn("[MSGCONNECTOR]: Unable to notify Message Server about login.  Presence might be borked for this user");
+                m_log.Warn("[Message Connector]: Unable to notify Message Server about login.  Presence might be borked for this user");
             }
-
         }
 
         private void NotifyQueueRunner()
@@ -437,10 +425,13 @@ namespace OpenSim.Grid.UserServer.Modules
             Hashtable result = new Hashtable();
 
             UUID regionID;
+
             if (UUID.TryParse((string)requestData["RegionUUID"], out regionID))
             {
                 if (OnRegionStartup != null)
+                {
                     OnRegionStartup(regionID);
+                }
 
                 result["responsestring"] = "TRUE";
             }
@@ -456,10 +447,13 @@ namespace OpenSim.Grid.UserServer.Modules
             Hashtable result = new Hashtable();
 
             UUID regionID;
+
             if (UUID.TryParse((string)requestData["RegionUUID"], out regionID))
             {
                 if (OnRegionShutdown != null)
+                {
                     OnRegionShutdown(regionID);
+                }
 
                 result["responsestring"] = "TRUE";
             }
@@ -477,10 +471,13 @@ namespace OpenSim.Grid.UserServer.Modules
             UUID agentID;
             UUID regionID;
             ulong regionHandle;
+
             if (UUID.TryParse((string)requestData["AgentID"], out agentID) && UUID.TryParse((string)requestData["RegionUUID"], out regionID) && ulong.TryParse((string)requestData["RegionHandle"], out regionHandle))
             {
                 if (OnAgentLocation != null)
+                {
                     OnAgentLocation(agentID, regionID, regionHandle);
+                }
 
                 result["responsestring"] = "TRUE";
             }
@@ -498,10 +495,13 @@ namespace OpenSim.Grid.UserServer.Modules
             UUID agentID;
             UUID regionID;
             ulong regionHandle;
+
             if (UUID.TryParse((string)requestData["AgentID"], out agentID) && UUID.TryParse((string)requestData["RegionUUID"], out regionID) && ulong.TryParse((string)requestData["RegionHandle"], out regionHandle))
             {
                 if (OnAgentLeaving != null)
+                {
                     OnAgentLeaving(agentID, regionID, regionHandle);
+                }
 
                 result["responsestring"] = "TRUE";
             }

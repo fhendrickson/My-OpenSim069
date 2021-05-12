@@ -1,29 +1,29 @@
-﻿/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+﻿/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections;
@@ -43,17 +43,12 @@ namespace OpenSim.Grid.GridServer.Modules
 {
     public class GridRestModule
     {
-         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private GridDBService m_gridDBService;
         private IGridServiceCore m_gridCore;
 
         protected GridConfig m_config;
-
-        /// <value>
-        /// Used to notify old regions as to which OpenSim version to upgrade to
-        /// </value>
-        //private string m_opensimVersion;
 
         protected BaseHttpServer m_httpServer;
 
@@ -69,7 +64,6 @@ namespace OpenSim.Grid.GridServer.Modules
 
         public void Initialise(string opensimVersion, GridDBService gridDBService, IGridServiceCore gridCore, GridConfig config)
         {
-            //m_opensimVersion = opensimVersion;
             m_gridDBService = gridDBService;
             m_gridCore = gridCore;
             m_config = config;
@@ -83,7 +77,7 @@ namespace OpenSim.Grid.GridServer.Modules
 
         public void RegisterHandlers()
         {
-            //have these in separate method as some servers restart the http server and reregister all the handlers.
+            // have these in separate method as some servers restart the http server and reregister all the handlers.
             m_httpServer = m_gridCore.GetHttpServer();
 
             m_httpServer.AddStreamHandler(new RestStreamHandler("GET", "/sims/", RestGetSimMethod));
@@ -102,8 +96,7 @@ namespace OpenSim.Grid.GridServer.Modules
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns></returns>
-        public string RestGetRegionMethod(string request, string path, string param,
-                                          OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public string RestGetRegionMethod(string request, string path, string param, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             return RestGetSimMethod(String.Empty, "/sims/", param, httpRequest, httpResponse);
         }
@@ -117,8 +110,7 @@ namespace OpenSim.Grid.GridServer.Modules
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
         /// <returns></returns>
-        public string RestSetRegionMethod(string request, string path, string param,
-                                          OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        public string RestSetRegionMethod(string request, string path, string param, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             return RestSetSimMethod(String.Empty, "/sims/", param, httpRequest, httpResponse);
         }
@@ -131,15 +123,17 @@ namespace OpenSim.Grid.GridServer.Modules
         /// <param name="param">A string representing the sim's UUID</param>
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
-        /// <returns>Information about the sim in XML</returns>
-        public string RestGetSimMethod(string request, string path, string param,
-                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        /// <returns>
+        /// Information about the sim in XML
+        /// </returns>
+        public string RestGetSimMethod(string request, string path, string param, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             string respstring = String.Empty;
 
             RegionProfileData TheSim;
 
             UUID UUID;
+
             if (UUID.TryParse(param, out UUID))
             {
                 TheSim = m_gridDBService.GetRegion(UUID);
@@ -179,13 +173,15 @@ namespace OpenSim.Grid.GridServer.Modules
         /// <param name="param"></param>
         /// <param name="httpRequest">HTTP request header object</param>
         /// <param name="httpResponse">HTTP response header object</param>
-        /// <returns>"OK" or an error</returns>
-        public string RestSetSimMethod(string request, string path, string param,
-                                       OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        /// <returns>
+        /// "OK" or an error
+        /// </returns>
+        public string RestSetSimMethod(string request, string path, string param, OSHttpRequest httpRequest, OSHttpResponse httpResponse)
         {
             m_log.Info("Processing region update via REST method");
             RegionProfileData theSim;
             theSim = m_gridDBService.GetRegion(new UUID(param));
+
             if (theSim == null)
             {
                 theSim = new RegionProfileData();
@@ -198,18 +194,19 @@ namespace OpenSim.Grid.GridServer.Modules
             doc.LoadXml(request);
             XmlNode rootnode = doc.FirstChild;
             XmlNode authkeynode = rootnode.ChildNodes[0];
+
             if (authkeynode.Name != "authkey")
             {
                 return "ERROR! bad XML - expected authkey tag";
             }
 
             XmlNode simnode = rootnode.ChildNodes[1];
+
             if (simnode.Name != "sim")
             {
                 return "ERROR! bad XML - expected sim tag";
             }
 
-            //theSim.regionSendKey = Cfg;
             theSim.regionRecvKey = m_config.SimRecvKey;
             theSim.regionSendKey = m_config.SimSendKey;
             theSim.regionSecret = m_config.SimRecvKey;
@@ -228,20 +225,16 @@ namespace OpenSim.Grid.GridServer.Modules
                     case "regionname":
                         theSim.regionName = simnode.ChildNodes[i].InnerText;
                         break;
-
                     case "sim_ip":
                         theSim.serverIP = simnode.ChildNodes[i].InnerText;
                         break;
-
                     case "sim_port":
                         theSim.serverPort = Convert.ToUInt32(simnode.ChildNodes[i].InnerText);
                         break;
-
                     case "region_locx":
                         theSim.regionLocX = Convert.ToUInt32((string)simnode.ChildNodes[i].InnerText);
                         theSim.regionHandle = Utils.UIntsToLong((theSim.regionLocX * Constants.RegionSize), (theSim.regionLocY * Constants.RegionSize));
                         break;
-
                     case "region_locy":
                         theSim.regionLocY = Convert.ToUInt32((string)simnode.ChildNodes[i].InnerText);
                         theSim.regionHandle = Utils.UIntsToLong((theSim.regionLocX * Constants.RegionSize), (theSim.regionLocY * Constants.RegionSize));
@@ -268,8 +261,7 @@ namespace OpenSim.Grid.GridServer.Modules
 
             try
             {
-                m_log.Info("[DATA]: " +
-                           "Updating / adding via " + m_gridDBService.GetNumberOfPlugins() + " storage provider(s) registered.");
+                m_log.Info("[Data]: " + "Updating / adding via " + m_gridDBService.GetNumberOfPlugins() + " storage provider(s) registered.");
 
                 return m_gridDBService.CheckReservations(theSim, authkeynode);
             }

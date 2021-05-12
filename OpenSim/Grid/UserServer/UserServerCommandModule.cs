@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections.Generic;
@@ -72,26 +72,29 @@ namespace OpenSim.Grid.UserServer
         public void PostInitialise()
         {
             UserConfig cfg;
+
             if (m_core.TryGet<UserConfig>(out cfg))
             {
                 m_cfg = cfg;
             }
 
             UserDataBaseService userDBservice;
+
             if (m_core.TryGet<UserDataBaseService>(out userDBservice))
             {
                 m_userDataBaseService = userDBservice;
             }
 
             UserLoginService loginService;
+
             if (m_core.TryGet<UserLoginService>(out loginService))
             {
                 m_loginService = loginService;
             }
 
             CommandConsole console;
-            if ((m_core.TryGet<CommandConsole>(out console)) && (m_cfg != null)
-                && (m_userDataBaseService != null) && (m_loginService != null))
+
+            if ((m_core.TryGet<CommandConsole>(out console)) && (m_cfg != null) && (m_userDataBaseService != null) && (m_loginService != null))
             {
                 RegisterConsoleCommands(console);
             }
@@ -136,6 +139,7 @@ namespace OpenSim.Grid.UserServer
         }
 
         #region Console Command Handlers
+
         public void do_create(string[] args)
         {
             switch (args[0])
@@ -153,19 +157,19 @@ namespace OpenSim.Grid.UserServer
         protected void Reset(string[] args)
         {
             if (args.Length == 0)
+            {
                 return;
+            }
 
             switch (args[0])
             {
                 case "user":
-
                     switch (args[1])
                     {
                         case "password":
                             ResetUserPassword(args);
                             break;
                     }
-
                     break;
             }
         }
@@ -173,7 +177,9 @@ namespace OpenSim.Grid.UserServer
         /// <summary>
         /// Create a new user
         /// </summary>
-        /// <param name="cmdparams">string array with parameters: firstname, lastname, password, locationX, locationY, email</param>
+        /// <param name="cmdparams">string array with 
+        /// parameters: firstname, lastname, password, locationX, locationY, email
+        /// </param>
         protected void CreateUser(string[] cmdparams)
         {
             string firstName;
@@ -184,28 +190,58 @@ namespace OpenSim.Grid.UserServer
             uint regY = 1000;
 
             if (cmdparams.Length < 2)
+            {
                 firstName = MainConsole.Instance.CmdPrompt("First name", "Default");
-            else firstName = cmdparams[1];
+            }
+            else
+            {
+                firstName = cmdparams[1];
+            }
 
             if (cmdparams.Length < 3)
+            {
                 lastName = MainConsole.Instance.CmdPrompt("Last name", "User");
-            else lastName = cmdparams[2];
+            }
+            else
+            {
+                lastName = cmdparams[2];
+            }
 
             if (cmdparams.Length < 4)
+            {
                 password = MainConsole.Instance.PasswdPrompt("Password");
-            else password = cmdparams[3];
+            }
+            else
+            {
+                password = cmdparams[3];
+            }
 
             if (cmdparams.Length < 5)
+            {
                 regX = Convert.ToUInt32(MainConsole.Instance.CmdPrompt("Start Region X", regX.ToString()));
-            else regX = Convert.ToUInt32(cmdparams[4]);
+            }
+            else
+            {
+                regX = Convert.ToUInt32(cmdparams[4]);
+            }
 
             if (cmdparams.Length < 6)
+            {
                 regY = Convert.ToUInt32(MainConsole.Instance.CmdPrompt("Start Region Y", regY.ToString()));
-            else regY = Convert.ToUInt32(cmdparams[5]);
+            }
+            else
+            {
+                regY = Convert.ToUInt32(cmdparams[5]);
+            }
 
             if (cmdparams.Length < 7)
+            {
                 email = MainConsole.Instance.CmdPrompt("Email", "");
-            else email = cmdparams[6];
+            }
+            else
+            {
+                email = cmdparams[6];
+            }
 
             if (null == m_userDataBaseService.GetUserProfile(firstName, lastName))
             {
@@ -213,7 +249,7 @@ namespace OpenSim.Grid.UserServer
             }
             else
             {
-                m_log.ErrorFormat("[USERS]: A user with the name {0} {1} already exists!", firstName, lastName);
+                m_log.ErrorFormat("[Users]: A user with the name {0} {1} already exists!", firstName, lastName);
             }
         }
 
@@ -228,26 +264,34 @@ namespace OpenSim.Grid.UserServer
             string newPassword;
 
             if (cmdparams.Length < 3)
+            {
                 firstName = MainConsole.Instance.CmdPrompt("First name");
-            else firstName = cmdparams[2];
+            }
+            else
+            {
+                firstName = cmdparams[2];
+            }
 
             if (cmdparams.Length < 4)
+            {
                 lastName = MainConsole.Instance.CmdPrompt("Last name");
-            else lastName = cmdparams[3];
+            }
+            else
+            {
+                lastName = cmdparams[3];
+            }
 
             if (cmdparams.Length < 5)
+            {
                 newPassword = MainConsole.Instance.PasswdPrompt("New password");
-            else newPassword = cmdparams[4];
+            }
+            else
+            {
+                newPassword = cmdparams[4];
+            }
 
             m_userDataBaseService.ResetUserPassword(firstName, lastName, newPassword);
         }
-
-        /*
-        private void HandleTestCommand(string module, string[] cmd)
-        {
-            m_log.Info("test command received");
-        }
-        */
 
         private void HandleLoginCommand(string module, string[] cmd)
         {
@@ -259,7 +303,6 @@ namespace OpenSim.Grid.UserServer
                     // Set the minimal level to allow login 
                     // Useful to allow grid update without worrying about users.
                     // or fixing critical issues
-                    //
                     if (cmd.Length > 2)
                     {
                         int level = Convert.ToInt32(cmd[2]);
@@ -292,20 +335,13 @@ namespace OpenSim.Grid.UserServer
                 case "create":
                     do_create(cmdparams);
                     break;
-
                 case "reset":
                     Reset(cmdparams);
                     break;
-
-
                 case "test-inventory":
-                    //  RestObjectPosterResponse<List<InventoryFolderBase>> requester = new RestObjectPosterResponse<List<InventoryFolderBase>>();
-                    // requester.ReturnResponseVal = TestResponse;
-                    // requester.BeginPostObject<UUID>(m_userManager._config.InventoryUrl + "RootFolders/", m_lastCreatedUser);
                     SynchronousRestObjectPoster.BeginPostObject<UUID, List<InventoryFolderBase>>(
                         "POST", m_cfg.InventoryUrl + "RootFolders/", m_lastCreatedUser);
                     break;
-
                 case "logoff-user":
                     if (cmdparams.Length >= 3)
                     {
@@ -314,16 +350,19 @@ namespace OpenSim.Grid.UserServer
                         string message = "";
 
                         for (int i = 2; i < cmdparams.Length; i++)
+                        {
                             message += " " + cmdparams[i];
+                        }
 
                         UserProfileData theUser = null;
+
                         try
                         {
                             theUser = m_loginService.GetTheUser(firstname, lastname);
                         }
                         catch (Exception)
                         {
-                            m_log.Error("[LOGOFF]: Error getting user data from the database.");
+                            m_log.Error("[Log Off]: Error getting user data from the database.");
                         }
 
                         if (theUser != null)
@@ -332,7 +371,7 @@ namespace OpenSim.Grid.UserServer
                             {
                                 if (theUser.CurrentAgent.AgentOnline)
                                 {
-                                    m_log.Info("[LOGOFF]: Logging off requested user!");
+                                    m_log.Info("[Log Off]: Logging off requested user!");
                                     m_loginService.LogOffUser(theUser, message);
 
                                     theUser.CurrentAgent.AgentOnline = false;
@@ -342,7 +381,7 @@ namespace OpenSim.Grid.UserServer
                                 else
                                 {
                                     m_log.Info(
-                                        "[LOGOFF]: User Doesn't appear to be online, sending the logoff message anyway.");
+                                        "[Log Off]: User Doesn't appear to be online, sending the logoff message anyway.");
                                     m_loginService.LogOffUser(theUser, message);
 
                                     theUser.CurrentAgent.AgentOnline = false;
@@ -353,23 +392,23 @@ namespace OpenSim.Grid.UserServer
                             else
                             {
                                 m_log.Error(
-                                    "[LOGOFF]: Unable to logoff-user.  User doesn't have an agent record so I can't find the simulator to notify");
+                                    "[Log Off]: Unable to logoff-user.  User doesn't have an agent record so I can't find the simulator to notify");
                             }
                         }
                         else
                         {
-                            m_log.Info("[LOGOFF]: User doesn't exist in the database");
+                            m_log.Info("[Log Off]: User doesn't exist in the database");
                         }
                     }
                     else
                     {
                         m_log.Error(
-                            "[LOGOFF]: Invalid amount of parameters.  logoff-user takes at least three.  Firstname, Lastname, and message");
+                            "[Log Off]: Invalid amount of parameters.  logoff-user takes at least three.  Firstname, Lastname, and message");
                     }
-
                     break;
             }
         }
     }
-        #endregion
+
+    #endregion
 }

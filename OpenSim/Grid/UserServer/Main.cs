@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections.Generic;
@@ -31,6 +31,7 @@ using System.IO;
 using System.Reflection;
 using log4net;
 using log4net.Config;
+using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Data;
 using OpenSim.Framework;
@@ -43,7 +44,6 @@ using OpenSim.Framework.Statistics;
 using OpenSim.Grid.Communications.OGS1;
 using OpenSim.Grid.Framework;
 using OpenSim.Grid.UserServer.Modules;
-using Nini.Config;
 
 namespace OpenSim.Grid.UserServer
 {
@@ -85,6 +85,7 @@ namespace OpenSim.Grid.UserServer
             argvSource.AddSwitch("Startup", "xmlfile", "x");
 
             IConfig startupConfig = argvSource.Configs["Startup"];
+
             if (startupConfig != null)
             {
                 m_consoleType = startupConfig.GetString("console", "local");
@@ -107,16 +108,17 @@ namespace OpenSim.Grid.UserServer
         {
             switch (m_consoleType)
             {
-            case "rest":
-                m_console = new RemoteConsole("User");
-                break;
-            case "basic":
-                m_console = new CommandConsole("User");
-                break;
-            default:
-                m_console = new LocalConsole("User");
-                break;
+                case "rest":
+                    m_console = new RemoteConsole("User");
+                    break;
+                case "basic":
+                    m_console = new CommandConsole("User");
+                    break;
+                default:
+                    m_console = new LocalConsole("User");
+                    break;
             }
+
             MainConsole.Instance = m_console;
         }
 
@@ -136,16 +138,16 @@ namespace OpenSim.Grid.UserServer
 
             m_stats = StatsManager.StartCollectingUserStats();
 
-            //setup services/modules
+            // setup services/modules
             StartupUserServerModules();
 
             StartOtherComponents(inventoryService);
 
-            //PostInitialise the modules
+            // PostInitialise the modules
             PostInitialiseModules();
 
-            //register http handlers and start http server
-            m_log.Info("[STARTUP]: Starting HTTP process");
+            // register http handlers and start http server
+            m_log.Info("[Startup]: Starting HTTP process");
             RegisterHttpHandlers();
             m_httpServer.Start();
 
@@ -171,12 +173,10 @@ namespace OpenSim.Grid.UserServer
             RegisterInterface<CommandConsole>(m_console);
             RegisterInterface<UserConfig>(Cfg);
 
-            //Should be in modules?
+            // Should be in modules?
             IInterServiceInventoryServices inventoryService = new OGS1InterServiceInventoryService(Cfg.InventoryUrl);
-            // IRegionProfileRouter regionProfileService = new RegionProfileServiceProxy();
 
             RegisterInterface<IInterServiceInventoryServices>(inventoryService);
-            // RegisterInterface<IRegionProfileRouter>(regionProfileService);
 
             return inventoryService;
         }
@@ -187,19 +187,19 @@ namespace OpenSim.Grid.UserServer
         /// <param name="inventoryService"></param>
         protected virtual void StartupUserServerModules()
         {
-            m_log.Info("[STARTUP]: Establishing data connection");
-            
-            //we only need core components so we can request them from here
+            m_log.Info("[Startup]: Establishing data connection");
+
+            // we only need core components so we can request them from here
             IInterServiceInventoryServices inventoryService;
             TryGet<IInterServiceInventoryServices>(out inventoryService);
-            
+
             CommunicationsManager commsManager = new UserServerCommsManager(inventoryService);
 
-            //setup database access service, for now this has to be created before the other modules.
+            // setup database access service, for now this has to be created before the other modules.
             m_userDataBaseService = new UserDataBaseService(commsManager);
             m_userDataBaseService.Initialise(this);
 
-            //TODO: change these modules so they fetch the databaseService class in the PostInitialise method
+            // TODO: change these modules so they fetch the databaseService class in the PostInitialise method
             m_userManager = new UserManager(m_userDataBaseService);
             m_userManager.Initialise(this);
 
@@ -225,9 +225,8 @@ namespace OpenSim.Grid.UserServer
             m_appearanceModule.Initialise(this);
 
             StartupLoginService(inventoryService);
-            //
+
             // Get the minimum defaultLevel to access to the grid
-            //
             m_loginService.setloginlevel((int)Cfg.DefaultUserLevel);
 
             RegisterInterface<UserLoginService>(m_loginService); //TODO: should be done in the login service
@@ -244,10 +243,12 @@ namespace OpenSim.Grid.UserServer
         {
             m_loginService = new UserLoginService(
                 m_userDataBaseService, inventoryService, new LibraryRootFolder(Cfg.LibraryXmlfile), Cfg, Cfg.DefaultStartupMsg, new RegionProfileServiceProxy());
-            
+
             if (Cfg.EnableHGLogin)
-                m_loginAuthService = new UserLoginAuthService(m_userDataBaseService, inventoryService, new LibraryRootFolder(Cfg.LibraryXmlfile), 
+            {
+                m_loginAuthService = new UserLoginAuthService(m_userDataBaseService, inventoryService, new LibraryRootFolder(Cfg.LibraryXmlfile),
                     Cfg, Cfg.DefaultStartupMsg, new RegionProfileServiceProxy());
+            }
         }
 
         protected virtual void PostInitialiseModules()
@@ -267,7 +268,9 @@ namespace OpenSim.Grid.UserServer
             m_loginService.RegisterHandlers(m_httpServer, Cfg.EnableLLSDLogin, true);
 
             if (m_loginAuthService != null)
+            {
                 m_loginAuthService.RegisterHandlers(m_httpServer);
+            }
 
             m_userManager.RegisterHandlers(m_httpServer);
             m_friendsModule.RegisterHandlers(m_httpServer);
@@ -282,6 +285,7 @@ namespace OpenSim.Grid.UserServer
         }
 
         #region IUGAIMCore
+
         protected Dictionary<Type, object> m_moduleInterfaces = new Dictionary<Type, object>();
 
         /// <summary>
@@ -307,6 +311,7 @@ namespace OpenSim.Grid.UserServer
                 iface = (T)m_moduleInterfaces[typeof(T)];
                 return true;
             }
+
             iface = default(T);
             return false;
         }
@@ -320,6 +325,7 @@ namespace OpenSim.Grid.UserServer
         {
             return m_httpServer;
         }
+
         #endregion
 
         public void TestResponse(List<InventoryFolderBase> resp)

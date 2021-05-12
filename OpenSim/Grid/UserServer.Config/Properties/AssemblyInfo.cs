@@ -25,25 +25,53 @@
 /// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// </license>
 
-using OpenSim.Framework;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace OpenSim.Grid.GridServer
-{
-    public interface IGridPlugin : IPlugin
-    {
-        void Initialise(GridServerBase gridServer);
-        void PostInitialise();
-    }
+/// <summary>
+/// General Information
+/// 
+/// This is the general information about an
+/// assembly is controlled through the following
+/// set of attributes.  We change these attribute
+/// values to modify the information associated
+/// with an assembly.
+/// </summary>
+[assembly: AssemblyTitle("UserConfig")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("http://opensimulator.org")]
+[assembly: AssemblyProduct("UserConfig")]
+[assembly: AssemblyCopyright("Copyright (c) OpenSimulator.org Developers 2007-2009")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
-    public class GridPluginInitialiser : PluginInitialiserBase
-    {
-        private GridServerBase server;
-        public GridPluginInitialiser (GridServerBase s) { server = s; }
+/// <summary>
+/// ComVisible Settings
+/// 
+/// By setting the ComVisible to false we make the
+/// types in this assembly invisible to COM components.
+/// If we need to access a type in this assembly from COM,
+/// then we set the ComVisible attribute to true on that type.
+/// </summary>
+[assembly: ComVisible(false)]
 
-        public override void Initialise (IPlugin plugin)
-        {
-            IGridPlugin p = plugin as IGridPlugin;
-            p.Initialise (server);
-        }
-    }
-}
+/// <summary>
+/// Version Information
+/// 
+/// The Version information for an assembly
+/// consists of the following four values:
+/// 
+///     Major Version
+///     Minor Version
+///     Build Number
+///     Revision
+///     
+/// We can set the Build and Revsision number by using
+/// the Build and Revision number or by simply
+/// using the "*" value for the Build and Revsion Number
+/// as follows:
+///     
+///     [assembly: AssemblyVersion("0.6.9.*")]
+/// </summary>
+[assembly: AssemblyVersion("0.6.9.*")]
