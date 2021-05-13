@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, http://opensimulator.org/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, http://opensimulator.org/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///    * Redistributions of source code must retain the above copyright
+///    notice, this list of conditions and the following disclaimer.
+///    * Redistributions in binary form must reproduce the above copyright
+///    notice, this list of conditions and the following disclaimer in the
+///    documentation and/or other materials provided with the distribution.
+///    * Neither the name of the OpenSimulator Project nor the
+///    names of its contributors may be used to endorse or promote products
+///    derived from this software without specific prior written permission.
+///    
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections.Generic;
@@ -43,18 +43,13 @@ namespace OpenSim.ApplicationPlugins.Rest
     {
         #region properties
 
-        protected static readonly ILog m_log =
-            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        protected static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private IConfig _config; // Configuration source: Rest Plugins
         private IConfig _pluginConfig; // Configuration source: Plugin specific
         private OpenSimBase _app; // The 'server'
         private BaseHttpServer _httpd; // The server's RPC interface
         private string _prefix; // URL prefix below
-        // which all REST URLs
-        // are living
-        // private StringWriter _sw = null;
-        // private RestXmlWriter _xw = null;
 
         private string _godkey;
         private int _reqk;
@@ -93,10 +88,7 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </summary>
         public bool IsEnabled
         {
-            get
-            {
-                return (null != _pluginConfig) && _pluginConfig.GetBoolean("enabled", false);
-            }
+            get { return (null != _pluginConfig) && _pluginConfig.GetBoolean("enabled", false); }
         }
 
         /// <summary>
@@ -149,32 +141,6 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </summary>
         public abstract string ConfigName { get; }
 
-        // public XmlTextWriter XmlWriter
-        // {
-        //     get
-        //     {
-        //         if (null == _xw)
-        //         {
-        //             _sw = new StringWriter();
-        //             _xw = new RestXmlWriter(_sw);
-        //             _xw.Formatting = Formatting.Indented;
-        //         }
-        //         return _xw;
-        //     }
-        // }
-
-        // public string XmlWriterResult
-        // {
-        //     get
-        //     {
-        //         _xw.Flush();
-        //         _xw.Close();
-        //         _xw = null;
-
-        //         return _sw.ToString();
-        //     }
-        // }
-
         #endregion properties
 
         #region methods
@@ -189,7 +155,7 @@ namespace OpenSim.ApplicationPlugins.Rest
 
         public void Initialise()
         {
-            m_log.Info("[RESTPLUGIN]: " + Name + " cannot be default-initialized!");
+            m_log.Info("[Rest Plugin]: " + Name + " cannot be default-initialized!");
             throw new PluginNotInitialisedException(Name);
         }
 
@@ -216,7 +182,6 @@ namespace OpenSim.ApplicationPlugins.Rest
 
                 if (!_config.GetBoolean("enabled", false))
                 {
-                    //m_log.WarnFormat("{0} Rest Plugins are disabled", MsgID);
                     return;
                 }
 
@@ -269,7 +234,10 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// <param name="method">RestMethod handler doing the actual work</param>
         public virtual void AddRestStreamHandler(string httpMethod, string path, RestMethod method)
         {
-            if (!IsEnabled) return;
+            if (!IsEnabled)
+            {
+                return;
+            }
 
             if (!path.StartsWith(_prefix))
             {
@@ -295,7 +263,11 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </returns>
         public bool AddAgentHandler(string agentName, IHttpAgentHandler handler)
         {
-            if (!IsEnabled) return false;
+            if (!IsEnabled)
+            {
+                return false;
+            }
+
             _agents.Add(agentName, handler);
             return _httpd.AddAgentHandler(agentName, handler);
         }
@@ -306,18 +278,24 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </summary>
         /// <param name="agentName">name of agent handler</param>
         /// <param name="handler">agent handler method</param>
-        /// <returns>false when the plugin is disabled or the agent
+        /// <returns>
+        /// false when the plugin is disabled or the agent
         /// handler could not be removed. Any generated exceptions are
         /// allowed to drop through to the caller, i.e. KeyNotFound.
         /// </returns>
         public bool RemoveAgentHandler(string agentName, IHttpAgentHandler handler)
         {
-            if (!IsEnabled) return false;
+            if (!IsEnabled)
+            {
+                return false;
+            }
+
             if (_agents[agentName] == handler)
             {
                 _agents.Remove(agentName);
                 return _httpd.RemoveAgentHandler(agentName, handler);
             }
+
             return false;
         }
 
@@ -327,11 +305,17 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// via X-OpenSim-Godkey?
         /// </summary>
         /// <param name="request">HTTP request header</param>
-        /// <returns>true when the HTTP request came from god.</returns>
+        /// <returns>
+        /// true when the HTTP request came from god.
+        /// </returns>
         protected bool IsGod(OSHttpRequest request)
         {
             string[] keys = request.Headers.GetValues("X-OpenSim-Godkey");
-            if (null == keys) return false;
+
+            if (null == keys)
+            {
+                return false;
+            }
 
             // we take the last key supplied
             return keys[keys.Length - 1] == _godkey;
@@ -344,7 +328,7 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </summary>
         protected bool IsVerifiedUser(OSHttpRequest request, UUID uuid)
         {
-            // XXX under construction
+            // under construction
             return false;
         }
 
@@ -357,11 +341,14 @@ namespace OpenSim.ApplicationPlugins.Rest
             {
                 _httpd.RemoveStreamHandler(h.HttpMethod, h.Path);
             }
+
             _handlers = null;
+
             foreach (KeyValuePair<string, IHttpAgentHandler> h in _agents)
             {
                 _httpd.RemoveAgentHandler(h.Key, h.Value);
             }
+
             _agents = null;
         }
 
@@ -375,10 +362,11 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// </summary>
         /// <param name="method">origin of the failure message</param>
         /// <param name="message">failure message</param>
-        /// <remarks>This should probably set a return code as
-        /// well. (?)</remarks>
-        protected string Failure(OSHttpResponse response, OSHttpStatusCode status,
-                                 string method, string format, params string[] msg)
+        /// <remarks>
+        /// This should probably set a return code as
+        /// well. (?)
+        /// </remarks>
+        protected string Failure(OSHttpResponse response, OSHttpStatusCode status, string method, string format, params string[] msg)
         {
             string m = String.Format(format, msg);
 
@@ -396,8 +384,7 @@ namespace OpenSim.ApplicationPlugins.Rest
         /// <param name="e">exception causing the failure message</param>
         /// <remarks>This should probably set a return code as
         /// well. (?)</remarks>
-        public string Failure(OSHttpResponse response, OSHttpStatusCode status,
-                              string method, Exception e)
+        public string Failure(OSHttpResponse response, OSHttpStatusCode status, string method, Exception e)
         {
             string m = String.Format("exception occurred: {0}", e.Message);
 
