@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Contributors, http://opensimulator.org/
+ * Copyright (c) Contributors, https://hyperionvirtual.com/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the OpenSimulator Project nor the
+ *     * Neither the name of the Hyperion Virtual Worlds Project nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
@@ -1444,7 +1444,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
                 for (int y = 0; y < 16; y++)
                 {
                     // For some terrains, sending more than one terrain patch at once results in a libsecondlife exception
-                    // see http://opensimulator.org/mantis/view.php?id=1662
+                    // see https://hyperionvirtual.com/mantis/view.php?id=1662
                     //for (int x = 0; x < 16; x += 4)
                     //{
                     //    SendLayerPacket(map, y, x);
@@ -1841,7 +1841,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             // packets containing metadata for in excess of 100 items.  But in practice, there may be other
             // factors (e.g. firewalls) restraining the maximum UDP packet size.  See,
             //
-            // http://opensimulator.org/mantis/view.php?id=226
+            // https://hyperionvirtual.com/mantis/view.php?id=226
             //
             // for one example of this kind of thing.  In fact, the Linden servers appear to only send about
             // 6 to 7 items at a time, so let's stick with 6
