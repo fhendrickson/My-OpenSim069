@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, https://hyperionvirtual.com/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Hyperion Virtual Worlds Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, https://hyperionvirtual.com/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///     * Redistributions of source code must retain the above copyright
+///     notice, this list of conditions and the following disclaimer.
+///     * Redistributions in binary form must reproduce the above copyright
+///     notice, this list of conditions and the following disclaimer in the
+///     documentation and/or other materials provided with the distribution.
+///     * Neither the name of the Hyperion Virtual Worlds Project nor the
+///     names of its contributors may be used to endorse or promote products
+///     derived from this software without specific prior written permission.
+///     
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections.Generic;
@@ -32,17 +32,17 @@ using System.Reflection;
 using System.Text;
 using log4net;
 using MXP;
+using MXP.Common.Proto;
+using MXP.Extentions.OpenMetaverseFramgments.Proto;
+using MXP.Fragments;
 using MXP.Messages;
+using MXP.Util;
 using OpenMetaverse;
 using OpenMetaverse.Packets;
 using OpenSim.Framework;
 using OpenSim.Framework.Client;
-using Packet=OpenMetaverse.Packets.Packet;
-using MXP.Extentions.OpenMetaverseFragments.Proto;
-using MXP.Util;
-using MXP.Fragments;
-using MXP.Common.Proto;
 using OpenSim.Region.Framework.Scenes;
+using Packet = OpenMetaverse.Packets.Packet;
 
 namespace OpenSim.Client.MXP.ClientStack
 {
@@ -51,15 +51,18 @@ namespace OpenSim.Client.MXP.ClientStack
         internal static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constants
+    
         private Vector3 FORWARD = new Vector3(1, 0, 0);
         private Vector3 BACKWARD = new Vector3(-1, 0, 0);
         private Vector3 LEFT = new Vector3(0, 1, 0);
         private Vector3 RIGHT = new Vector3(0, -1, 0);
         private Vector3 UP = new Vector3(0, 0, 1);
         private Vector3 DOWN = new Vector3(0, 0, -1);
+        
         #endregion
 
         #region Fields
+        
         private readonly Session m_session;
         private readonly UUID m_sessionID;
         private readonly UUID m_userID;
@@ -70,6 +73,7 @@ namespace OpenSim.Client.MXP.ClientStack
         private int m_objectsSynchronized = -1;
 
         private Vector3 m_startPosition=new Vector3(128f, 128f, 128f);
+        
         #endregion
 
         #region Properties
@@ -153,16 +157,20 @@ namespace OpenSim.Client.MXP.ClientStack
         public bool IsActive
         {
             get { return Session.SessionState == SessionState.Connected; }
+
             set
             {
                 if (!value)
+                {
                     Stop();
+                }
             }
         }
 
         #endregion
 
         #region Constructors
+        
         public MXPClientView(Session mxpSession, UUID mxpSessionID, UUID userID, IScene mxpHostBubble, string mxpFirstName, string mxpLastName)
         {
             this.m_session = mxpSession;
@@ -172,6 +180,7 @@ namespace OpenSim.Client.MXP.ClientStack
             this.m_scene = mxpHostBubble;
             this.m_sessionID = mxpSessionID;
         }
+        
         #endregion
 
         #region MXP Incoming Message Processing
@@ -184,13 +193,14 @@ namespace OpenSim.Client.MXP.ClientStack
             }
             else
             {
-                m_log.Warn("[MXP ClientStack] Received messaged unhandled: " + message);
+                m_log.Warn("[ClientStack]: Received messaged unhandled: " + message);
             }
         }
 
         private void MXPProcessModifyRequest(ModifyRequestMessage modifyRequest)
         {
             ObjectFragment objectFragment=modifyRequest.ObjectFragment;
+            
             if (objectFragment.ObjectId == m_userID.Guid)
             {
                 OmAvatarExt avatarExt = modifyRequest.GetExtension<OmAvatarExt>();
@@ -201,10 +211,12 @@ namespace OpenSim.Client.MXP.ClientStack
                 agentUpdate.State = (byte)avatarExt.State;
 
                 Quaternion avatarOrientation = FromOmQuaternion(objectFragment.Orientation);
+            
                 if (avatarOrientation.X == 0 && avatarOrientation.Y == 0 && avatarOrientation.Z == 0 && avatarOrientation.W == 0)
                 {
                     avatarOrientation = Quaternion.Identity;
                 }
+                
                 Vector3 avatarLocation=FromOmVector(objectFragment.Location);
 
                 if (avatarExt.MovementDirection != null)
@@ -217,28 +229,33 @@ namespace OpenSim.Client.MXP.ClientStack
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_POS;
                     }
+                
                     if ((direction - BACKWARD).Length() < 0.5)
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_AT_NEG;
                     }
+                    
                     if ((direction - LEFT).Length() < 0.5)
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_LEFT_POS;
                     }
+                    
                     if ((direction - RIGHT).Length() < 0.5)
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_LEFT_NEG;
                     }
+                    
                     if ((direction - UP).Length() < 0.5)
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_UP_POS;
                     }
+                    
                     if ((direction - DOWN).Length() < 0.5)
                     {
                         agentUpdate.ControlFlags += (uint)AgentManager.ControlFlags.AGENT_CONTROL_UP_NEG;
                     }
-
                 }
+
                 if (avatarExt.TargetOrientation != null)
                 {
                     agentUpdate.BodyRotation = FromOmQuaternion(avatarExt.TargetOrientation);
@@ -302,7 +319,7 @@ namespace OpenSim.Client.MXP.ClientStack
         private void MXPSendPrimitive(uint localID, UUID ownerID, Vector3 acc, Vector3 rvel, PrimitiveBaseShape primShape, Vector3 pos, UUID objectID, Vector3 vel, Quaternion rotation, uint flags, string text, byte[] textColor, uint parentID, byte[] particleSystem, byte clickAction, byte material, byte[] textureanim)
         {
             String typeName = ToOmType(primShape.PCode);
-            m_log.Info("[MXP ClientStack] Transmitting Primitive" + typeName);
+            m_log.Info("[ClientStack]: Transmitting Primitive" + typeName);
 
             PerceptionEventMessage pe = new PerceptionEventMessage();           
             pe.ObjectFragment.ObjectId = objectID.Guid;
@@ -311,6 +328,7 @@ namespace OpenSim.Client.MXP.ClientStack
 
             // Resolving parent UUID.
             OpenSim.Region.Framework.Scenes.Scene scene = (OpenSim.Region.Framework.Scenes.Scene)Scene;
+            
             if (scene.Entities.ContainsKey(parentID))
             {
                 pe.ObjectFragment.ParentObjectId = scene.Entities[parentID].UUID.Guid;
@@ -336,7 +354,6 @@ namespace OpenSim.Client.MXP.ClientStack
 
             if (!((primShape.PCode == (byte)PCode.NewTree) || (primShape.PCode == (byte)PCode.Tree) || (primShape.PCode == (byte)PCode.Grass)))
             {
-
                 ext.PathBegin = primShape.PathBegin;
                 ext.PathEnd = primShape.PathEnd;
                 ext.PathScaleX = primShape.PathScaleX;
@@ -355,8 +372,6 @@ namespace OpenSim.Client.MXP.ClientStack
                 ext.PathTaperY = primShape.PathTaperY;
                 ext.PathTwist = primShape.PathTwist;
                 ext.PathTwistBegin = primShape.PathTwistBegin;
-
-
             }
 
             ext.UpdateFlags = flags;
@@ -390,7 +405,7 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void MXPSendAvatarData(string participantName, UUID ownerID, UUID parentId, UUID avatarID, uint avatarLocalID, Vector3 position, Quaternion rotation)
         {
-            m_log.Info("[MXP ClientStack] Transmitting Avatar Data " + participantName);
+            m_log.Info("[ClientStack]: Transmitting Avatar Data " + participantName);
 
             PerceptionEventMessage pe = new PerceptionEventMessage();
 
@@ -418,7 +433,7 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void MXPSendTerrain(float[] map)
         {
-            m_log.Info("[MXP ClientStack] Transmitting terrain for " + m_scene.RegionInfo.RegionName);
+            m_log.Info("[ClientStack]: Transmitting terrain for " + m_scene.RegionInfo.RegionName);
 
             PerceptionEventMessage pe = new PerceptionEventMessage();
 
@@ -502,20 +517,10 @@ namespace OpenSim.Client.MXP.ClientStack
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
-//        private Vector3 FromOmVector(float[] vector)
-//        {
-//            return new Vector3(vector[0], vector[1], vector[2]);
-//        }
-
         private Quaternion FromOmQuaternion(MsdQuaternion4f quaternion)
         {
             return new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
         }
-
-//        private Quaternion FromOmQuaternion(float[] quaternion)
-//        {
-//            return new Quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3]);
-//        }
 
         private MsdColor4f ToOmColor(byte[] value)
         {
@@ -533,26 +538,32 @@ namespace OpenSim.Client.MXP.ClientStack
             {
                 return "Avatar";
             }
+
             if (value == (byte)PCodeEnum.Grass)
             {
                 return "Grass";
             }
+
             if (value == (byte)PCodeEnum.NewTree)
             {
                 return "NewTree";
             }
+
             if (value == (byte)PCodeEnum.ParticleSystem)
             {
                 return "ParticleSystem";
             }
+
             if (value == (byte)PCodeEnum.Primitive)
             {
                 return "Primitive";
             }
+
             if (value == (byte)PCodeEnum.Tree)
             {
                 return "Tree";
             }
+
             throw new Exception("Unsupported PCode value: " + value);
         }
 
@@ -561,6 +572,7 @@ namespace OpenSim.Client.MXP.ClientStack
         #region OpenSim Event Handlers
 
         #pragma warning disable 67
+
         public event GenericMessage OnGenericMessage;
         public event ImprovedInstantMessage OnInstantMessage;
         public event ChatMessage OnChatFromClient;
@@ -761,6 +773,7 @@ namespace OpenSim.Client.MXP.ClientStack
         #endregion
 
         #region OpenSim ClientView Public Methods
+
         // Do we need this?
         public bool SendLogoutPacketWhenClosing
         {
@@ -774,31 +787,32 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void SetDebugPacketLevel(int newDebug)
         {
-            //m_debugLevel = newDebug;
         }
 
         public void InPacket(object NewPack)
         {
-            //throw new System.NotImplementedException();
         }
 
         public void ProcessInPacket(Packet NewPack)
         {
-            //throw new System.NotImplementedException();
         }
 
         public void OnClean()
         {
             if (OnLogout != null)
+            {
                 OnLogout(this);
+            }
 
             if (OnConnectionClosed != null)
+            {
                 OnConnectionClosed(this);
+            }
         }
 
         public void Close(bool ShutdownCircuit)
         {
-            m_log.Info("[MXP ClientStack] Close Called with SC=" + ShutdownCircuit);
+            m_log.Info("[ClientStack]: Close Called with SC=" + ShutdownCircuit);
 
             // Tell the client to go
             SendLogoutPacket();
@@ -808,7 +822,6 @@ namespace OpenSim.Client.MXP.ClientStack
             {
                 Session.SetStateDisconnected();
             }
-
         }
 
         public void Kick(string message)
@@ -825,10 +838,12 @@ namespace OpenSim.Client.MXP.ClientStack
             AvatarAppearance appearance;
             scene.GetAvatarAppearance(this,out appearance);
             List<byte> visualParams = new List<byte>();
+            
             foreach (byte visualParam in appearance.VisualParams)
             {
                 visualParams.Add(visualParam);
             }
+            
             OnSetAppearance(appearance.Texture.GetBytes(), visualParams);
         }
 
@@ -867,7 +882,7 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args)
         {
-            m_log.Info("[MXP ClientStack] Completing Handshake to Region");
+            m_log.Info("[ClientStack]: Completing Handshake to Region");
 
             if (OnRegionHandShakeReply != null)
             {
@@ -925,12 +940,12 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void MoveAgentIntoRegion(RegionInfo regInfo, Vector3 pos, Vector3 look)
         {
-            //throw new System.NotImplementedException();
+
         }
 
         public void InformClientOfNeighbour(ulong neighbourHandle, IPEndPoint neighbourExternalEndPoint)
         {
-            //throw new System.NotImplementedException();
+
         }
 
         public AgentCircuitData RequestClientInfo()
@@ -966,7 +981,7 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void SendLocalTeleport(Vector3 position, Vector3 lookAt, uint flags)
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public void SendRegionTeleport(ulong regionHandle, byte simAccess, IPEndPoint regionExternalEndPoint, uint locationID, uint flags, string capsURL)
@@ -996,7 +1011,6 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void SendAvatarData(ulong regionHandle, string firstName, string lastName, string grouptitle, UUID avatarID, uint avatarLocalID, Vector3 position, byte[] textureEntry, uint parentID, Quaternion rotation)
         {
-            //ScenePresence presence=((Scene)this.Scene).GetScenePresence(avatarID);
             UUID ownerID = avatarID;
             MXPSendAvatarData(firstName + " " + lastName, ownerID, UUID.Zero, avatarID, avatarLocalID, position, rotation);
         }
@@ -1301,12 +1315,12 @@ namespace OpenSim.Client.MXP.ClientStack
 
         public void SendObjectPropertiesFamilyData(uint RequestFlags, UUID ObjectUUID, UUID OwnerID, UUID GroupID, uint BaseMask, uint OwnerMask, uint GroupMask, uint EveryoneMask, uint NextOwnerMask, int OwnershipCost, byte SaleType, int SalePrice, uint Category, UUID LastOwnerID, string ObjectName, string Description)
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public void SendObjectPropertiesReply(UUID ItemID, ulong CreationDate, UUID CreatorUUID, UUID FolderUUID, UUID FromTaskUUID, UUID GroupUUID, short InventorySerial, UUID LastOwnerUUID, UUID ObjectUUID, UUID OwnerUUID, string TouchTitle, byte[] TextureID, string SitTitle, string ItemName, string ItemDescription, uint OwnerMask, uint NextOwnerMask, uint GroupMask, uint EveryoneMask, uint BaseMask, byte saleType, int salePrice)
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public void SendAgentOffline(UUID[] agentIDs)
@@ -1377,7 +1391,6 @@ namespace OpenSim.Client.MXP.ClientStack
         public byte[] GetThrottlesPacked(float multiplier)
         {
             // LL Specific, get out of IClientAPI
-
             const int singlefloat = 4;
             float tResend = multiplier;
             float tLand = multiplier;
@@ -1420,12 +1433,11 @@ namespace OpenSim.Client.MXP.ClientStack
         public ClientInfo GetClientInfo()
         {
             return null;
-            //throw new System.NotImplementedException();
         }
 
         public void SetClientInfo(ClientInfo info)
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public void SetClientOption(string option, string value)

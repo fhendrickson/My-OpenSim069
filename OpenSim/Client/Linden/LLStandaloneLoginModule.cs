@@ -1,29 +1,29 @@
-/*
- * Copyright (c) Contributors, https://hyperionvirtual.com/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Hyperion Virtual Worlds Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, https://hyperionvirtual.com/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///     * Redistributions of source code must retain the above copyright
+///     notice, this list of conditions and the following disclaimer.
+///     * Redistributions in binary form must reproduce the above copyright
+///     notice, this list of conditions and the following disclaimer in the
+///     documentation and/or other materials provided with the distribution.
+///     * Neither the name of the Hyperion Virtual Worlds Project nor the
+///     names of its contributors may be used to endorse or promote products
+///     derived from this software without specific prior written permission.
+///     
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections;
@@ -35,19 +35,17 @@ using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Communications;
 using OpenSim.Framework.Communications.Cache;
-using OpenSim.Framework.Capabilities;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Interfaces;
+using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Client.Linden
 {
     public class LLStandaloneLoginModule : ISharedRegionModule, ILoginServiceToRegionsConnector
     {
-        //private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         protected List<Scene> m_scenes = new List<Scene>();
         protected Scene m_firstScene;
 
@@ -78,6 +76,7 @@ namespace OpenSim.Client.Linden
         public void Initialise(IConfigSource source)
         {
             IConfig startupConfig = source.Configs["Startup"];
+
             if (startupConfig != null)
             {
                 m_enabled = !startupConfig.GetBoolean("gridmode", false);
@@ -88,6 +87,7 @@ namespace OpenSim.Client.Linden
                 authenticate = true;
                 welcomeMessage = "Welcome to OpenSim";
                 IConfig standaloneConfig = source.Configs["StandAlone"];
+
                 if (standaloneConfig != null)
                 {
                     authenticate = standaloneConfig.GetBoolean("accounts_authenticate", true);
@@ -127,8 +127,7 @@ namespace OpenSim.Client.Linden
                 if (m_enabled)
                 {
                     //TODO: fix casting.
-                    LibraryRootFolder rootFolder
-                        = m_firstScene.CommsManager.UserProfileCacheService.LibraryRoot as LibraryRootFolder;
+                    LibraryRootFolder rootFolder = m_firstScene.CommsManager.UserProfileCacheService.LibraryRoot as LibraryRootFolder;
 
                     IHttpServer httpServer = m_firstScene.CommsManager.HttpServer;
 
@@ -192,10 +191,12 @@ namespace OpenSim.Client.Linden
         public bool NewUserConnection(ulong regionHandle, AgentCircuitData agent, out string reason)
         {
             Scene scene;
+
             if (TryGetRegion(regionHandle, out scene))
             {
                 return scene.NewUserConnection(agent, out reason);
             }
+            
             reason = "Region not found.";
             return false;
         }
@@ -203,6 +204,7 @@ namespace OpenSim.Client.Linden
         public void LogOffUserFromGrid(ulong regionHandle, UUID AvatarID, UUID RegionSecret, string message)
         {
             Scene scene;
+            
             if (TryGetRegion(regionHandle, out scene))
             {
                  scene.HandleLogOffUserFromGrid(AvatarID, RegionSecret, message);
@@ -212,30 +214,36 @@ namespace OpenSim.Client.Linden
         public RegionInfo RequestNeighbourInfo(ulong regionhandle)
         {
             Scene scene;
+            
             if (TryGetRegion(regionhandle, out scene))
             {
                 return scene.RegionInfo;
             }
+            
             return null;
         }
 
         public RegionInfo RequestClosestRegion(string region)
         {
             Scene scene;
+            
             if (TryGetRegion(region, out scene))
             {
                 return scene.RegionInfo;
             }
+            
             return null;
         }
 
         public RegionInfo RequestNeighbourInfo(UUID regionID)
         {
             Scene scene;
+            
             if (TryGetRegion(regionID, out scene))
             {
                 return scene.RegionInfo;
             }
+            
             return null;
         }
 

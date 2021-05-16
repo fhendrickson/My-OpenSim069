@@ -1,41 +1,41 @@
-/*
- * Copyright (c) Contributors, https://hyperionvirtual.com/
- * See CONTRIBUTORS.TXT for a full list of copyright holders.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Hyperion Virtual Worlds Project nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/// <license>
+/// Copyright (c) Contributors, https://hyperionvirtual.com/
+/// See CONTRIBUTORS.TXT for a full list of copyright holders.
+/// 
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///     * Redistributions of source code must retain the above copyright
+///     notice, this list of conditions and the following disclaimer.
+///     * Redistributions in binary form must reproduce the above copyright
+///     notice, this list of conditions and the following disclaimer in the
+///     documentation and/or other materials provided with the distribution.
+///     * Neither the name of the Hyperion Virtual Worlds Project nor the
+///     names of its contributors may be used to endorse or promote products
+///     derived from this software without specific prior written permission.
+///     
+/// THIS SOFTWARE IS PROVIDED BY THE DEVELOPERS ``AS IS'' AND ANY
+/// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+/// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+/// DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
+/// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+/// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+/// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+/// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+/// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+/// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/// </license>
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Nwc.XmlRpc;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Authentication;
+using System.Text;
 using log4net;
 using Nini.Config;
+using Nwc.XmlRpc;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Communications;
@@ -46,7 +46,8 @@ using OpenSim.Region.Framework.Scenes;
 namespace OpenSim.Client.Linden
 {
     /// <summary>
-    /// Handles login user (expect user) and logoff user messages from the remote LL login server
+    /// Handles login user (expect user) and logoff 
+    /// user messages from the remote LL login server
     /// </summary>
     public class LLProxyLoginModule : ISharedRegionModule
     {
@@ -77,6 +78,7 @@ namespace OpenSim.Client.Linden
         public void Initialise(IConfigSource source)
         {
             IConfig startupConfig = source.Configs["Startup"];
+   
             if (startupConfig != null)
             {
                 m_enabled = startupConfig.GetBoolean("gridmode", false);
@@ -99,7 +101,6 @@ namespace OpenSim.Client.Linden
             {
                 AddScene(scene);
             }
-
         }
 
         public void RemoveRegion(Scene scene)
@@ -142,7 +143,7 @@ namespace OpenSim.Client.Linden
         /// </summary>
         protected void AddHttpHandlers()
         {
-            //we will add our handlers to the first scene we received, as all scenes share a http server. But will this ever change?
+            // we will add our handlers to the first scene we received, as all scenes share a http server. But will this ever change?
             m_firstScene.CommsManager.HttpServer.AddXmlRPCHandler("expect_user", ExpectUser);
             m_firstScene.CommsManager.HttpServer.AddXmlRPCHandler("logoff_user", LogOffUser);
         }
@@ -168,6 +169,7 @@ namespace OpenSim.Client.Linden
                 }
             }
         }
+
         /// <summary>
         /// Received from the user server when a user starts logging in.  This call allows
         /// the region to prepare for direct communication from the client.  Sends back an empty
@@ -190,24 +192,23 @@ namespace OpenSim.Client.Linden
 
             // Appearance
             if (requestData["appearance"] != null)
+            {
                 agentData.Appearance = new AvatarAppearance((Hashtable)requestData["appearance"]);
+            }
 
-            m_log.DebugFormat(
-                "[CLIENT]: Told by user service to prepare for a connection from {0} {1} {2}, circuit {3}",
+            m_log.DebugFormat("[Client]: Told by user service to prepare for a connection from {0} {1} {2}, circuit {3}",
                 agentData.firstname, agentData.lastname, agentData.AgentID, agentData.circuitcode);
 
             if (requestData.ContainsKey("child_agent") && requestData["child_agent"].Equals("1"))
             {
-                //m_log.Debug("[CLIENT]: Child agent detected");
                 agentData.child = true;
             }
             else
             {
-                //m_log.Debug("[CLIENT]: Main agent detected");
-                agentData.startpos =
-                    new Vector3((float)Convert.ToDecimal((string)requestData["startpos_x"]),
-                                  (float)Convert.ToDecimal((string)requestData["startpos_y"]),
-                                  (float)Convert.ToDecimal((string)requestData["startpos_z"]));
+                agentData.startpos = new Vector3((float)Convert.ToDecimal((string)requestData["startpos_x"]),
+                    (float)Convert.ToDecimal((string)requestData["startpos_y"]),
+                    (float)Convert.ToDecimal((string)requestData["startpos_z"]));
+                
                 agentData.child = false;
             }
 
@@ -215,8 +216,7 @@ namespace OpenSim.Client.Linden
 
             if (!RegionLoginsEnabled)
             {
-                m_log.InfoFormat(
-                    "[CLIENT]: Denying access for user {0} {1} because region login is currently disabled",
+                m_log.InfoFormat("[Client]: Denying access for user {0} {1} because region login is currently disabled",
                     agentData.firstname, agentData.lastname);
 
                 Hashtable respdata = new Hashtable();
@@ -230,18 +230,19 @@ namespace OpenSim.Client.Linden
                 string denyMess = "";
 
                 Scene scene;
+
                 if (TryGetRegion(regionHandle, out scene))
                 {
                     if (scene.RegionInfo.EstateSettings.IsBanned(agentData.AgentID))
                     {
                         denyMess = "User is banned from this region";
-                        m_log.InfoFormat(
-                            "[CLIENT]: Denying access for user {0} {1} because user is banned",
+                        m_log.InfoFormat("[Client]: Denying access for user {0} {1} because user is banned",
                             agentData.firstname, agentData.lastname);
                     }
                     else
                     {
                         string reason;
+
                         if (scene.NewUserConnection(agentData, out reason))
                         {
                             success = true;
@@ -249,12 +250,10 @@ namespace OpenSim.Client.Linden
                         else
                         {
                             denyMess = String.Format("Login refused by region: {0}", reason);
-                            m_log.InfoFormat(
-                                "[CLIENT]: Denying access for user {0} {1} because user connection was refused by the region",
+                            m_log.InfoFormat("[Client]: Denying access for user {0} {1} because user connection was refused by the region",
                                 agentData.firstname, agentData.lastname);
                         }
                     }
-
                 }
                 else
                 {
@@ -287,7 +286,7 @@ namespace OpenSim.Client.Linden
         /// <returns></returns>
         public XmlRpcResponse LogOffUser(XmlRpcRequest request, IPEndPoint remoteClient)
         {
-            m_log.Debug("[CONNECTION DEBUGGING]: LogOff User Called");
+            m_log.Debug("[Connection Debugging]: LogOff User Called");
 
             Hashtable requestData = (Hashtable)request.Params[0];
             string message = (string)requestData["message"];
@@ -299,6 +298,7 @@ namespace OpenSim.Client.Linden
             ulong regionHandle = Convert.ToUInt64((string)requestData["regionhandle"]);
 
             Scene scene;
+
             if (TryGetRegion(regionHandle, out scene))
             {
                 scene.HandleLogOffUserFromGrid(agentID, RegionSecret, message);
@@ -324,6 +324,5 @@ namespace OpenSim.Client.Linden
             scene = null;
             return false;
         }
-
     }
 }
